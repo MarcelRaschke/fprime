@@ -19,15 +19,15 @@
 
 namespace Drv {
 
-SocketReadTask::SocketReadTask() : m_stop(false) {}
+SocketReadTask::SocketReadTask() : m_reconnect(false), m_stop(false) {}
 
 SocketReadTask::~SocketReadTask() {}
 
 void SocketReadTask::startSocketTask(const Fw::StringBase &name,
                                      const bool reconnect,
-                                     const NATIVE_INT_TYPE priority,
-                                     const NATIVE_INT_TYPE stack,
-                                     const NATIVE_INT_TYPE cpuAffinity) {
+                                     const NATIVE_UINT_TYPE priority,
+                                     const NATIVE_UINT_TYPE stack,
+                                     const NATIVE_UINT_TYPE cpuAffinity) {
     FW_ASSERT(not m_task.isStarted());  // It is a coding error to start this task multiple times
     FW_ASSERT(not this->m_stop);        // It is a coding error to stop the thread before it is started
     m_reconnect = reconnect;

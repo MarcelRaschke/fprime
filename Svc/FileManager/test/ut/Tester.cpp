@@ -28,13 +28,8 @@ namespace Svc {
 
   Tester ::
     Tester() :
-#if FW_OBJECT_NAMES == 1
       FileManagerGTestBase("Tester", MAX_HISTORY_SIZE),
       component("FileManager")
-#else
-      FileManagerGTestBase(MAX_HISTORY_SIZE),
-      component()
-#endif
   {
     this->connectPorts();
     this->initComponents();
@@ -238,7 +233,7 @@ namespace Svc {
 #endif
 
     // Remove test_file
-    this->removeFile("test_file");
+    this->removeFile("test_file", false);
 
     // Assert success
     this->assertSuccess(
@@ -264,7 +259,7 @@ namespace Svc {
 #endif
 
     // Attempt to remove test_file (should fail)
-    this->removeFile("test_file");
+    this->removeFile("test_file", false);
 
     // Assert failure
     this->assertFailure(
@@ -424,6 +419,50 @@ namespace Svc {
     );
   }
 
+  void Tester ::
+    fileSizeSucceed() {
+#if defined TGT_OS_TYPE_LINUX || TGT_OS_TYPE_DARWIN
+    // Remove testing files, if they exist
+    this->system("rm -rf file1");
+
+    this->system("echo 'file1 text' > file1");
+#else
+    FAIL(); // Commands not implemented for this OS
+#endif
+    Fw::CmdStringArg cmdStringFile("file1");
+    this->sendCmd_FileSize(
+        INSTANCE,
+        CMD_SEQ,
+        cmdStringFile
+    );
+    this->component.doDispatch();
+
+    this->assertSuccess(FileManager::OPCODE_FILESIZE, 2);
+    ASSERT_EVENTS_FileSizeSucceeded(0, "file1", 11);
+  }
+
+  void Tester ::
+    fileSizeFail() {
+#if defined TGT_OS_TYPE_LINUX || TGT_OS_TYPE_DARWIN
+    // Remove testing files, if they exist
+    this->system("rm -rf file1");
+#else
+    FAIL(); // Commands not implemented for this OS
+#endif
+
+    Fw::CmdStringArg cmdStringFile("file1");
+    this->sendCmd_FileSize(
+        INSTANCE,
+        CMD_SEQ,
+        cmdStringFile
+    );
+    this->component.doDispatch();
+
+    this->assertFailure(
+        FileManager::OPCODE_FILESIZE
+    );
+  }
+
   // ----------------------------------------------------------------------
   // Helper methods
   // ----------------------------------------------------------------------
@@ -535,13 +574,14 @@ namespace Svc {
   }
 
   void Tester ::
-    removeFile(const char *const fileName)
+    removeFile(const char *const fileName, bool ignoreErrors)
   {
     Fw::CmdStringArg cmdStringFile(fileName);
     this->sendCmd_RemoveFile(
         INSTANCE,
         CMD_SEQ,
-        cmdStringFile
+        cmdStringFile,
+        ignoreErrors
     );
     this->component.doDispatch();
   }

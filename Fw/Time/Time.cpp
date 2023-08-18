@@ -1,7 +1,8 @@
 #include <Fw/Time/Time.hpp>
-#include <Fw/Types/BasicTypes.hpp>
+#include <FpConfig.hpp>
 
 namespace Fw {
+    const Time ZERO_TIME = Time();
 
     Time::Time() : m_seconds(0), m_useconds(0), m_timeBase(TB_NONE), m_timeContext(0)  {
     }
@@ -143,7 +144,7 @@ namespace Fw {
         return this->m_timeBase;
     }
 
-    U8 Time::getContext() const {
+    FwTimeContextStoreType Time::getContext() const {
         return this->m_timeContext;
     }
 

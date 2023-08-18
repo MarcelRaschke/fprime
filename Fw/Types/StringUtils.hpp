@@ -1,6 +1,6 @@
 #ifndef FW_STRINGUTILS_HPP
 #define FW_STRINGUTILS_HPP
-#include "Fw/Types/BasicTypes.hpp"
+#include <FpConfig.hpp>
 
 namespace Fw {
 namespace StringUtils {
@@ -32,6 +32,6 @@ char* string_copy(char* destination, const char* source, U32 num);
  */
 U32 string_length(const CHAR* source, U32 max_len);
 
-};      // namespace StringUtils
-};      // namespace Fw
+}       // namespace StringUtils
+}       // namespace Fw
 #endif  // FW_STRINGUTILS_HPP

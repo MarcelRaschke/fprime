@@ -33,13 +33,8 @@ namespace Svc {
 
   Tester ::
     Tester(bool doInitLog) :
-#if FW_OBJECT_NAMES == 1
       BufferLoggerGTestBase("Tester", MAX_HISTORY_SIZE),
       component("BufferLogger")
-#else
-      BufferLoggerGTestBase(MAX_HISTORY_SIZE),
-      component()
-#endif
   {
     (void) system("rm -rf buf");
     (void) system("mkdir buf");
@@ -270,7 +265,7 @@ namespace Svc {
 
     {
       // Make sure the file size is within bounds
-      U64 actualSize = 0;
+      FwSizeType actualSize = 0;
       const Os::FileSystem::Status status =
         Os::FileSystem::getFileSize(fileName, actualSize);
       ASSERT_EQ(Os::FileSystem::OP_OK, status);

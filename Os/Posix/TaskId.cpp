@@ -7,15 +7,14 @@
 
 extern "C" {
 #include <pthread.h>
-};
+}
 
 #include <Os/TaskId.hpp>
 
 namespace Os
 {
-    TaskId::TaskId()
+    TaskId::TaskId() : id(pthread_self())
     {
-        id = pthread_self();
     }
     TaskId::~TaskId()
     {

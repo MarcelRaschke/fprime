@@ -1,13 +1,14 @@
 ####
 # F prime CMakeLists.txt:
 #
-# SOURCE_FILES: combined list of source and autocoding diles
+# SOURCE_FILES: combined list of source and autocoding files
 # MOD_DEPS: (optional) module dependencies
 #
 # Note: using PROJECT_NAME as EXECUTABLE_NAME
 ####
-set(SOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/Assert.cpp"
-  "${CMAKE_CURRENT_LIST_DIR}/Types.fpp"
+
+set(SOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/Types.fpp"
+  "${CMAKE_CURRENT_LIST_DIR}/Assert.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/String.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/InternalInterfaceString.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/MallocAllocator.cpp"
@@ -30,11 +31,6 @@ set(UT_MOD_DEPS
   "${FPRIME_FRAMEWORK_PATH}/Os"
 )
 register_fprime_ut()
-
-set(UT_SOURCE_FILES
-    "${CMAKE_CURRENT_LIST_DIR}/test/ut/TestStringUtils.cpp"
-)
-register_fprime_ut("Fw_Types_StringUtils")
 
 # Non-test directory
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/GTest")

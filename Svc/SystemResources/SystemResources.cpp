@@ -13,7 +13,7 @@
 #include <cmath>  //isnan()
 #include <Svc/SystemResources/SystemResources.hpp>
 #include <version.hpp>
-#include "Fw/Types/BasicTypes.hpp"
+#include <FpConfig.hpp>
 
 namespace Svc {
 
@@ -39,10 +39,6 @@ SystemResources ::SystemResources(const char* const compName)
     }
 
     m_cpu_count = (m_cpu_count >= CPU_COUNT) ? CPU_COUNT : m_cpu_count;
-}
-
-void SystemResources ::init(const NATIVE_INT_TYPE instance) {
-    SystemResourcesComponentBase::init(instance);
 
     m_cpu_tlm_functions[0] = &Svc::SystemResources::tlmWrite_CPU_00;
     m_cpu_tlm_functions[1] = &Svc::SystemResources::tlmWrite_CPU_01;
@@ -60,6 +56,10 @@ void SystemResources ::init(const NATIVE_INT_TYPE instance) {
     m_cpu_tlm_functions[13] = &Svc::SystemResources::tlmWrite_CPU_13;
     m_cpu_tlm_functions[14] = &Svc::SystemResources::tlmWrite_CPU_14;
     m_cpu_tlm_functions[15] = &Svc::SystemResources::tlmWrite_CPU_15;
+}
+
+void SystemResources ::init(const NATIVE_INT_TYPE instance) {
+    SystemResourcesComponentBase::init(instance);
 }
 
 SystemResources ::~SystemResources() {}
@@ -89,9 +89,11 @@ void SystemResources ::ENABLE_cmdHandler(const FwOpcodeType opCode,
 }
 
 void SystemResources ::VERSION_cmdHandler(const FwOpcodeType opCode, const U32 cmdSeq) {
-    Fw::LogStringArg version_string(VERSION);
+    Fw::LogStringArg version_string(FRAMEWORK_VERSION);
+    this->log_ACTIVITY_LO_FRAMEWORK_VERSION(version_string);
 
-    this->log_ACTIVITY_LO_VERSION(version_string);
+    version_string = PROJECT_VERSION;
+    this->log_ACTIVITY_LO_PROJECT_VERSION(version_string);
     this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
 }
 
@@ -140,8 +142,8 @@ void SystemResources::Mem() {
 }
 
 void SystemResources::PhysMem() {
-    U64 total = 0;
-    U64 free = 0;
+    FwSizeType total = 0;
+    FwSizeType free = 0;
 
     if (Os::FileSystem::getFreeSpace("/", total, free) == Os::FileSystem::OP_OK) {
         this->tlmWrite_NON_VOLATILE_FREE(free / 1024);
@@ -150,7 +152,10 @@ void SystemResources::PhysMem() {
 }
 
 void SystemResources::Version() {
-    Fw::TlmString version_string(VERSION);
-    this->tlmWrite_VERSION(version_string);
+    Fw::TlmString version_string(FRAMEWORK_VERSION);
+    this->tlmWrite_FRAMEWORK_VERSION(version_string);
+
+    version_string= PROJECT_VERSION;
+    this->tlmWrite_PROJECT_VERSION(version_string);
 }
 }  // end namespace Svc

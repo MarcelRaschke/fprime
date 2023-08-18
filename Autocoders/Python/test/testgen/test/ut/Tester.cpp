@@ -12,13 +12,8 @@ namespace Ref {
 
   Tester ::
     Tester() :
-#if FW_OBJECT_NAMES == 1
       MathSenderGTestBase("Tester", MAX_HISTORY_SIZE),
       component("MathSender")
-#else
-      MathSenderGTestBase(MAX_HISTORY_SIZE),
-      component()
-#endif
   {
     this->initComponents();
     this->connectPorts();
@@ -40,7 +35,7 @@ namespace Ref {
       this->sendCmd_MS_DO_MATH(0,10,1.0,2.0,MathSenderComponentBase::ADD);
       // retrieve the message from the message queue and dispatch the command to the handler
       this->component.doDispatch();
-      // verify that that only one output port was called
+      // verify that only one output port was called
       ASSERT_FROM_PORT_HISTORY_SIZE(1);
       // verify that the math operation port was only called once
       ASSERT_from_mathOut_SIZE(1);
@@ -94,7 +89,7 @@ namespace Ref {
       this->sendCmd_MS_DO_MATH(0,10,1.0,2.0,MathSenderComponentBase::SUBTRACT);
       // retrieve the message from the message queue and dispatch the command to the handler
       this->component.doDispatch();
-      // verify that that only one output port was called
+      // verify that only one output port was called
       ASSERT_FROM_PORT_HISTORY_SIZE(1);
       // verify that the math operation port was only called once
       ASSERT_from_mathOut_SIZE(1);
@@ -148,7 +143,7 @@ namespace Ref {
       this->sendCmd_MS_DO_MATH(0,10,1.0,2.0,MathSenderComponentBase::MULTIPLY);
       // retrieve the message from the message queue and dispatch the command to the handler
       this->component.doDispatch();
-      // verify that that only one output port was called
+      // verify that only one output port was called
       ASSERT_FROM_PORT_HISTORY_SIZE(1);
       // verify that the math operation port was only called once
       ASSERT_from_mathOut_SIZE(1);
@@ -202,7 +197,7 @@ namespace Ref {
       this->sendCmd_MS_DO_MATH(0,10,1.0,2.0,MathSenderComponentBase::DIVIDE);
       // retrieve the message from the message queue and dispatch the command to the handler
       this->component.doDispatch();
-      // verify that that only one output port was called
+      // verify that only one output port was called
       ASSERT_FROM_PORT_HISTORY_SIZE(1);
       // verify that the math operation port was only called once
       ASSERT_from_mathOut_SIZE(1);

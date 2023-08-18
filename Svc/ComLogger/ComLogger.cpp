@@ -5,7 +5,7 @@
 // ----------------------------------------------------------------------
 
 #include <Svc/ComLogger/ComLogger.hpp>
-#include <Fw/Types/BasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/SerialBuffer.hpp>
 #include <Fw/Types/StringUtils.hpp>
 #include <Os/ValidateFile.hpp>
@@ -25,20 +25,28 @@ namespace Svc {
       byteCount(0),
       writeErrorOccurred(false),
       openErrorOccurred(false),
-      storeBufferLength(storeBufferLength)
+      storeBufferLength(storeBufferLength),
+      initialized(true)
   {
-    if( this->storeBufferLength ) {
-      FW_ASSERT(maxFileSize > sizeof(U16), maxFileSize); // must be a positive integer greater than buffer length size
-    }
-    else {
-      FW_ASSERT(maxFileSize > sizeof(0), maxFileSize); // must be a positive integer
-    }
-    FW_ASSERT(strnlen(incomingFilePrefix, sizeof(this->filePrefix)) < sizeof(this->filePrefix),
-      strnlen(incomingFilePrefix, sizeof(this->filePrefix)), sizeof(this->filePrefix)); // ensure that file prefix is not too big
-
-    // Set the file prefix:
-    Fw::StringUtils::string_copy(this->filePrefix, incomingFilePrefix, sizeof(this->filePrefix));
+    this->init_log_file(incomingFilePrefix, maxFileSize, storeBufferLength);
   }
+
+  ComLogger ::
+    ComLogger(const char* compName) :
+      ComLoggerComponentBase(compName),
+      filePrefix(),
+      maxFileSize(0),
+      fileMode(CLOSED),
+      fileName(),
+      hashFileName(),
+      byteCount(0),
+      writeErrorOccurred(false),
+      openErrorOccurred(false),
+      storeBufferLength(),
+      initialized(false)
+  {
+  }
+
 
   void ComLogger ::
     init(
@@ -48,6 +56,25 @@ namespace Svc {
   {
     ComLoggerComponentBase::init(queueDepth, instance);
   }
+
+  void ComLogger ::
+    init_log_file(const char* incomingFilePrefix, U32 maxFileSize, bool storeBufferLength)
+  {
+    FW_ASSERT(incomingFilePrefix != nullptr);
+    this->maxFileSize = maxFileSize;
+    this->storeBufferLength = storeBufferLength;
+    if( this->storeBufferLength ) {
+      FW_ASSERT(maxFileSize > sizeof(U16), maxFileSize);
+    }
+
+    FW_ASSERT(Fw::StringUtils::string_length(incomingFilePrefix, sizeof(this->filePrefix)) < sizeof(this->filePrefix),
+      Fw::StringUtils::string_length(incomingFilePrefix, sizeof(this->filePrefix)), sizeof(this->filePrefix)); // ensure that file prefix is not too big
+
+    (void)Fw::StringUtils::string_copy(this->filePrefix, incomingFilePrefix, sizeof(this->filePrefix));
+
+    this->initialized = true;
+  }
+
 
   ComLogger ::
     ~ComLogger()
@@ -142,21 +169,26 @@ namespace Svc {
   {
     FW_ASSERT( CLOSED == this->fileMode );
 
+    if( !this->initialized ){
+        this->log_WARNING_LO_FileNotInitialized();
+        return;
+    }
+
     U32 bytesCopied;
 
     // Create filename:
     Fw::Time timestamp = getTime();
     memset(this->fileName, 0, sizeof(this->fileName));
-    bytesCopied = snprintf(this->fileName, sizeof(this->fileName), "%s_%d_%d_%06d.com",
-      this->filePrefix, static_cast<U32>(timestamp.getTimeBase()), timestamp.getSeconds(), timestamp.getUSeconds());
+    bytesCopied = snprintf(this->fileName, sizeof(this->fileName), "%s_%" PRI_FwTimeBaseStoreType "_%" PRIu32 "_%06" PRIu32 ".com",
+      this->filePrefix, static_cast<FwTimeBaseStoreType>(timestamp.getTimeBase()), timestamp.getSeconds(), timestamp.getUSeconds());
 
     // "A return value of size or more means that the output was truncated"
     // See here: http://linux.die.net/man/3/snprintf
     FW_ASSERT( bytesCopied < sizeof(this->fileName) );
 
     // Create sha filename:
-    bytesCopied = snprintf(this->hashFileName, sizeof(this->hashFileName), "%s_%d_%d_%06d.com%s",
-      this->filePrefix, static_cast<U32>(timestamp.getTimeBase()), timestamp.getSeconds(), timestamp.getUSeconds(), Utils::Hash::getFileExtensionString());
+    bytesCopied = snprintf(this->hashFileName, sizeof(this->hashFileName), "%s_%" PRI_FwTimeBaseStoreType "_%" PRIu32 "_%06" PRIu32 ".com%s",
+      this->filePrefix, static_cast<FwTimeBaseStoreType>(timestamp.getTimeBase()), timestamp.getSeconds(), timestamp.getUSeconds(), Utils::Hash::getFileExtensionString());
     FW_ASSERT( bytesCopied < sizeof(this->hashFileName) );
 
     Os::File::Status ret = file.open(this->fileName, Os::File::OPEN_WRITE);
