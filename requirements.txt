@@ -66,4 +66,4 @@ typing-extensions==4.7.1
 types-python-dateutil==2.8.19.14
 urllib3==1.26.18
 Werkzeug==3.0.1
-zipp==3.15.0
+zipp==3.19.1
