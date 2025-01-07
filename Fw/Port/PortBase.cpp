@@ -38,13 +38,13 @@ namespace Fw {
 
     }
 
-    bool PortBase::isConnected() {
+    bool PortBase::isConnected() const {
         return m_connObj == nullptr?false:true;
     }
 
 #if FW_PORT_TRACING == 1
 
-    void PortBase::trace() {
+    void PortBase::trace() const {
         bool do_trace = false;
 
         if (this->m_ovr_trace) {
@@ -57,9 +57,9 @@ namespace Fw {
 
         if (do_trace) {
 #if FW_OBJECT_NAMES == 1
-            Fw::Logger::logMsg("Trace: %s\n", reinterpret_cast<POINTER_CAST>(this->m_objName.toChar()), 0, 0, 0, 0, 0);
+            Fw::Logger::log("Trace: %s\n", this->m_objName.toChar());
 #else
-            Fw::Logger::logMsg("Trace: %p\n", reinterpret_cast<POINTER_CAST>(this), 0, 0, 0, 0, 0);
+            Fw::Logger::log("Trace: %p\n", this);
 #endif
         }
     }

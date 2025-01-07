@@ -71,6 +71,9 @@ namespace Drv {
       // Helpers
       void test_with_loop(U32 iterations, bool recv_thread=false);
 
+      bool wait_on_change(bool open, U32 iterations);
+      bool wait_on_started(bool open, U32 iterations);
+
     private:
 
       // ----------------------------------------------------------------------
@@ -129,7 +132,6 @@ namespace Drv {
       //!
       TcpServerComponentImpl component;
       Fw::Buffer m_data_buffer;
-      Fw::Buffer m_data_buffer2;
       U8 m_data_storage[SEND_DATA_BUFFER_SIZE];
       std::atomic<bool> m_spinner;
 

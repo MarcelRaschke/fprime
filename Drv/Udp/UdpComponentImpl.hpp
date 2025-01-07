@@ -14,13 +14,13 @@
 #define UdpComponentImpl_HPP
 
 #include <Drv/Ip/IpSocket.hpp>
-#include <Drv/Ip/SocketReadTask.hpp>
+#include <Drv/Ip/SocketComponentHelper.hpp>
 #include <Drv/Ip/UdpSocket.hpp>
 #include "Drv/Udp/UdpComponentAc.hpp"
 
 namespace Drv {
 
-class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
+class UdpComponentImpl : public UdpComponentBase, public SocketComponentHelper {
   public:
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
@@ -70,9 +70,10 @@ class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
      *
      * \param hostname: ip address of remote tcp server in the form x.x.x.x
      * \param port: port of remote tcp server
+     * \param buffer_size: size of the buffer to be allocated. Defaults to 1024.
      *  \return status of the configure
      */
-    SocketIpStatus configureRecv(const char* hostname, const U16 port);
+    SocketIpStatus configureRecv(const char* hostname, const U16 port, FwSizeType buffer_size = 1024);
 
     /**
      * \brief get the port being received on
@@ -149,6 +150,8 @@ PROTECTED:
     Drv::SendStatus send_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& fwBuffer);
 
     Drv::UdpSocket m_socket; //!< Socket implementation
+
+    FwSizeType m_allocation_size; //!< Member variable to store the buffer size
 };
 
 }  // end namespace Drv

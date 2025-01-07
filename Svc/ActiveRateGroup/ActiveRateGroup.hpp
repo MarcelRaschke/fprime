@@ -40,16 +40,6 @@ namespace Svc {
             //!  \param compName Name of the component
             ActiveRateGroup(const char* compName);
 
-            //!  \brief ActiveRateGroup initialization function
-            //!
-            //!  The initialization function of the class initializes the member
-            //!  ports and the component base class
-            //!
-            //!  \param queueDepth Depth of the active component message queue
-            //!  \param instance Identifies the instance of the rate group component
-
-            void init(NATIVE_INT_TYPE queueDepth, NATIVE_INT_TYPE instance);
-
             //!  \brief ActiveRateGroup configuration function
             //!
             //!  The configuration function takes an array of context values to pass to
@@ -79,7 +69,7 @@ namespace Svc {
             //!  \param portNum incoming port call. For this class, should always be zero
             //!  \param cycleStart value stored by the cycle driver, used to compute execution time.
 
-            void CycleIn_handler(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart);
+            void CycleIn_handler(NATIVE_INT_TYPE portNum, Os::RawTime& cycleStart);
 
             //!  \brief Input cycle port pre message hook
             //!
@@ -89,7 +79,7 @@ namespace Svc {
             //!  \param portNum incoming port call. For this class, should always be zero
             //!  \param cycleStart value stored by the cycle driver, used to compute execution time.
 
-            void CycleIn_preMsgHook(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart); //!< CycleIn pre-message hook
+            void CycleIn_preMsgHook(NATIVE_INT_TYPE portNum, Os::RawTime& cycleStart); //!< CycleIn pre-message hook
 
             //!  \brief Input ping port handler
             //!

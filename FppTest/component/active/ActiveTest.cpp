@@ -22,16 +22,6 @@
 
   }
 
-  void ActiveTest ::
-    init(
-        NATIVE_INT_TYPE queueDepth,
-        NATIVE_INT_TYPE msgSize,
-        NATIVE_INT_TYPE instance
-    )
-  {
-    ActiveTestComponentBase::init(queueDepth, msgSize, instance);
-  }
-
   ActiveTest ::
     ~ActiveTest()
   {
@@ -104,10 +94,10 @@
   void ActiveTest ::
     stringArgsAsync_handler(
         const NATIVE_INT_TYPE portNum,
-        const str80String &str80,
-        str80RefString &str80Ref,
-        const str100String &str100,
-        str100RefString &str100Ref
+        const Fw::StringBase &str80,
+        Fw::StringBase &str80Ref,
+        const Fw::StringBase &str100,
+        Fw::StringBase &str100Ref
     )
   {
     this->stringArgsOut_out(
@@ -332,10 +322,10 @@
   void ActiveTest ::
     stringArgsGuarded_handler(
         const NATIVE_INT_TYPE portNum,
-        const str80String &str80,
-        str80RefString &str80Ref,
-        const str100String &str100,
-        str100RefString &str100Ref
+        const Fw::StringBase &str80,
+        Fw::StringBase &str80Ref,
+        const Fw::StringBase &str100,
+        Fw::StringBase &str100Ref
     )
   {
     this->stringArgsOut_out(
@@ -350,10 +340,10 @@
   void ActiveTest ::
     stringArgsSync_handler(
         const NATIVE_INT_TYPE portNum,
-        const str80String &str80,
-        str80RefString &str80Ref,
-        const str100String &str100,
-        str100RefString &str100Ref
+        const Fw::StringBase &str80,
+        Fw::StringBase &str80Ref,
+        const Fw::StringBase &str100,
+        Fw::StringBase &str100Ref
     )
   {
     this->stringArgsOut_out(
@@ -404,6 +394,13 @@
   {
     return this->structReturnOut_out(portNum, s, sRef);
   }
+
+  void ActiveTest ::
+      enumArgsHook_handler(
+          const NATIVE_INT_TYPE portNum,
+          const FormalParamEnum &en,
+          FormalParamEnum &enRef
+      ) {}
 
   // ----------------------------------------------------------------------
   // Handler implementations for user-defined serial input ports
@@ -696,3 +693,16 @@
     this->structInterface.args.val = str;
   }
 
+  // ----------------------------------------------------------------------
+  // Overflow hook implementations for user-defined async ports interfaces
+  // ----------------------------------------------------------------------
+
+  void ActiveTest ::
+      enumArgsHook_overflowHook(
+          const NATIVE_INT_TYPE portNum,
+          const FormalParamEnum &en,
+          FormalParamEnum &enRef
+  )
+  {
+      this->enumArgsHookOverflowed_out(portNum, en, enRef);
+  }

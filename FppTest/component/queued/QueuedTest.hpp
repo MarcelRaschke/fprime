@@ -26,13 +26,6 @@ class QueuedTest :
         const char* const compName //!< The component name
     );
 
-    //! Initialize QueuedTest object
-    void init(
-        NATIVE_INT_TYPE queueDepth, //!< The queue depth
-        NATIVE_INT_TYPE msgSize, //!< The message size
-        NATIVE_INT_TYPE instance = 0 //!< The instance number
-    );
-
     //! Destroy QueuedTest object
     ~QueuedTest();
 
@@ -203,28 +196,28 @@ class QueuedTest :
     //! Handler implementation for stringArgsAsync
     void stringArgsAsync_handler(
         NATIVE_INT_TYPE portNum, //!< The port number
-        const StringArgsPortStrings::StringSize80& str80, //!< A string of size 80
-        StringArgsPortStrings::StringSize80& str80Ref,
-        const StringArgsPortStrings::StringSize100& str100, //!< A string of size 100
-        StringArgsPortStrings::StringSize100& str100Ref
+        const Fw::StringBase& str80, //!< A string of size 80
+        Fw::StringBase& str80Ref,
+        const Fw::StringBase& str100, //!< A string of size 100
+        Fw::StringBase& str100Ref
     );
 
     //! Handler implementation for stringArgsGuarded
     void stringArgsGuarded_handler(
         NATIVE_INT_TYPE portNum, //!< The port number
-        const StringArgsPortStrings::StringSize80& str80, //!< A string of size 80
-        StringArgsPortStrings::StringSize80& str80Ref,
-        const StringArgsPortStrings::StringSize100& str100, //!< A string of size 100
-        StringArgsPortStrings::StringSize100& str100Ref
+        const Fw::StringBase& str80, //!< A string of size 80
+        Fw::StringBase& str80Ref,
+        const Fw::StringBase& str100, //!< A string of size 100
+        Fw::StringBase& str100Ref
     );
 
     //! Handler implementation for stringArgsSync
     void stringArgsSync_handler(
         NATIVE_INT_TYPE portNum, //!< The port number
-        const StringArgsPortStrings::StringSize80& str80, //!< A string of size 80
-        StringArgsPortStrings::StringSize80& str80Ref,
-        const StringArgsPortStrings::StringSize100& str100, //!< A string of size 100
-        StringArgsPortStrings::StringSize100& str100Ref
+        const Fw::StringBase& str80, //!< A string of size 80
+        Fw::StringBase& str80Ref,
+        const Fw::StringBase& str100, //!< A string of size 100
+        Fw::StringBase& str100Ref
     );
 
     //! Handler implementation for structArgsAsync
@@ -260,6 +253,13 @@ class QueuedTest :
         NATIVE_INT_TYPE portNum, //!< The port number
         const FormalParamStruct& s, //!< A struct
         FormalParamStruct& sRef //!< A struct ref
+    );
+
+    //! Handler implementation for enumArgsOverflow
+    void enumArgsHook_handler(
+        NATIVE_INT_TYPE portNum, //!< The port number
+        const FormalParamEnum& en, //!< An enum
+        FormalParamEnum& enRef //!< An enum ref
     );
 
   PRIVATE:
@@ -443,6 +443,20 @@ class QueuedTest :
     void internalStruct_internalInterfaceHandler(
         const FormalParamStruct& str //!< A struct
     );
+
+  PRIVATE:
+
+    // ----------------------------------------------------------------------
+    // Overflow hook implementations for user-defined async ports interfaces
+    // ----------------------------------------------------------------------
+
+    //! Overflow hook implementation for enumArgsOverflow
+    void enumArgsHook_overflowHook(
+        NATIVE_INT_TYPE portNum, //!< The port number
+        const FormalParamEnum& en, //!< An enum
+        FormalParamEnum& enRef //!< An enum ref
+    );
+
 
   public:
 

@@ -38,7 +38,7 @@ namespace Svc {
           unsigned long long missed;
           int ret = static_cast<int>(read (fd, &missed, sizeof (missed)));
           if (-1 == ret) {
-              Fw::Logger::logMsg("timer read error: %s\n", reinterpret_cast<POINTER_CAST>(strerror(errno)));
+              Fw::Logger::log("timer read error: %s\n", strerror(errno));
           }
           this->m_mutex.lock();
           bool quit = this->m_quit;
@@ -52,8 +52,8 @@ namespace Svc {
               timerfd_settime (fd, 0, &itval, nullptr);
               return;
           }
-          this->m_timer.take();
-          this->CycleOut_out(0,this->m_timer);
+          this->m_rawTime.now();
+          this->CycleOut_out(0,this->m_rawTime);
       }
   }
 

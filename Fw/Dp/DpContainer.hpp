@@ -170,6 +170,13 @@ class DpContainer {
     void setBuffer(const Buffer& buffer  //!< The packet buffer
     );
 
+    //! Invalidate the packet buffer
+    void invalidateBuffer() {
+        this->m_buffer = Fw::Buffer();
+        this->m_dataBuffer.clear();
+        this->m_dataSize = 0;
+    }
+
     //! Get the stored header hash
     //! \return The hash
     Utils::HashBuffer getHeaderHash() const;

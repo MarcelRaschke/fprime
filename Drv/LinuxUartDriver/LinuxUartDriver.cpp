@@ -35,10 +35,6 @@ LinuxUartDriver ::LinuxUartDriver(const char* const compName)
     : LinuxUartDriverComponentBase(compName), m_fd(-1), m_allocationSize(0),  m_device("NOT_EXIST"), m_quitReadThread(false) {
 }
 
-void LinuxUartDriver ::init(const NATIVE_INT_TYPE instance) {
-  LinuxUartDriverComponentBase::init(instance);
-}
-
 bool LinuxUartDriver::open(const char* const device,
                            UartBaudRate baud,
                            UartFlowControl fc,
@@ -355,7 +351,7 @@ void LinuxUartDriver ::serialReadTaskEntry(void* ptr) {
             status = RecvStatus::RECV_ERROR;
             comp->recv_out(0, buff, status);
             // to avoid spinning, wait 50 ms
-            Os::Task::delay(Fw::Time(0, 50));
+            Os::Task::delay(Fw::TimeInterval(0, 50000));
             continue;
         }
 
