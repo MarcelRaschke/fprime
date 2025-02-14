@@ -11,13 +11,12 @@ namespace Svc {
 
 		// Only called by derived class
 		ConsoleTextLoggerImpl(const char* compName);
-		void init(NATIVE_INT_TYPE instanceId = 0);
 		~ConsoleTextLoggerImpl();
 
 	private:
 
 		// downcalls for input ports
-		void TextLogger_handler(NATIVE_INT_TYPE portNum, FwEventIdType id, Fw::Time &timeTag, const Fw::LogSeverity& severity, Fw::TextLogString &text);
+		void TextLogger_handler(FwIndexType portNum, FwEventIdType id, Fw::Time &timeTag, const Fw::LogSeverity& severity, Fw::TextLogString &text);
 	};
 
 }

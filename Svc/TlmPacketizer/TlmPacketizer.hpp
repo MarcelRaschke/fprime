@@ -29,12 +29,6 @@ class TlmPacketizer : public TlmPacketizerComponentBase {
     TlmPacketizer(const char* const compName /*!< The component name*/
     );
 
-    //! Initialize object TlmPacketizer
-    //!
-    void init(const NATIVE_INT_TYPE queueDepth,  /*!< The queue depth*/
-              const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-    );
-
     void setPacketList(
         const TlmPacketizerPacketList& packetList,   // channels to packetize
         const Svc::TlmPacketizerPacket& ignoreList,  // channels to ignore (i.e. no warning event if not packetized)
@@ -51,7 +45,7 @@ class TlmPacketizer : public TlmPacketizerComponentBase {
 
     //! Handler implementation for TlmRecv
     //!
-    void TlmRecv_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void TlmRecv_handler(const FwIndexType portNum, /*!< The port number*/
                          FwChanIdType id,               /*!< Telemetry Channel ID*/
                          Fw::Time& timeTag,             /*!< Time Tag*/
                          Fw::TlmBuffer& val             /*!< Buffer containing serialized telemetry value*/
@@ -59,13 +53,13 @@ class TlmPacketizer : public TlmPacketizerComponentBase {
 
     //! Handler implementation for Run
     //!
-    void Run_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void Run_handler(const FwIndexType portNum, /*!< The port number*/
                      U32 context                    /*!< The call order*/
     );
 
     //! Handler implementation for pingIn
     //!
-    void pingIn_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void pingIn_handler(const FwIndexType portNum, /*!< The port number*/
                         U32 key                        /*!< Value to return to pinger*/
     );
 

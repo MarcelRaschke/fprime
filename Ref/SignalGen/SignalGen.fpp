@@ -50,9 +50,6 @@ module Ref {
     @ Time get port
     time get port timeCaller
 
-    @ Telemetry port
-    telemetry port tlmOut
-
     @ Signal generation data product record
     product record DataRecord: SignalInfo id 0
 
@@ -81,8 +78,9 @@ module Ref {
     # ----------------------------------------------------------------------
     # Interfaces
     # ----------------------------------------------------------------------
-    include "../../Fw/Interfaces/EventsInterface.fppi"
+    include "../../Fw/Interfaces/EventInterface.fppi"
     include "../../Fw/Interfaces/CommandInterface.fppi"
+    include "../../Fw/Interfaces/ChannelInterface.fppi"
 
   }
 

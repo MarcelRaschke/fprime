@@ -32,11 +32,6 @@ class LinuxUartDriver : public LinuxUartDriverComponentBase {
     LinuxUartDriver(const char* const compName /*!< The component name*/
     );
 
-    //! Initialize object LinuxUartDriver
-    //!
-    void init(const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-    );
-
     //! Configure UART parameters
     enum UartBaudRate {
       BAUD_9600=9600,
@@ -98,7 +93,7 @@ class LinuxUartDriver : public LinuxUartDriverComponentBase {
 
     //! Handler implementation for serialSend
     //!
-    Drv::SendStatus send_handler(NATIVE_INT_TYPE portNum, /*!< The port number*/
+    Drv::SendStatus send_handler(FwIndexType portNum, /*!< The port number*/
                                  Fw::Buffer& serBuffer);
 
 

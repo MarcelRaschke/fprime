@@ -7,7 +7,7 @@
 #include <Fw/Types/PolyType.hpp>
 #include <Fw/Types/Serializable.hpp>
 #include <Fw/Types/String.hpp>
-#include <Os/InterruptLock.hpp>
+#include <Fw/Types/StringTemplate.hpp>
 #include <Os/IntervalTimer.hpp>
 //
 // Created by mstarch on 12/7/20.
@@ -607,6 +607,14 @@ TEST(SerializationTest, Serialization1) {
     str1.serialize(buff);
     str2.deserialize(buff);
     ASSERT_EQ(str1, str2);
+
+    // serialize string template
+    Fw::StringTemplate<80> strTmpl1("Foo");
+    Fw::StringTemplate<80> strTmpl2("Bar");
+    buff.resetSer();
+    strTmpl1.serialize(buff);
+    strTmpl2.deserialize(buff);
+    ASSERT_EQ(strTmpl1, strTmpl2);
 }
 
 struct TestStruct {
@@ -648,9 +656,6 @@ TEST(PerformanceTest, SerPerfTest) {
     MySerializable out;
     SerializeTestBuffer buff;
 
-    Os::InterruptLock intLock;
-
-    intLock.lock();
     timer.start();
 
     I32 iterations = 1000000;
@@ -660,7 +665,6 @@ TEST(PerformanceTest, SerPerfTest) {
     }
 
     timer.stop();
-    intLock.unLock();
 
     printf("%d iterations took %d us (%f each).\n", iterations, timer.getDiffUsec(),
            static_cast<F32>(timer.getDiffUsec()) / static_cast<F32>(iterations));
@@ -670,10 +674,8 @@ TEST(PerformanceTest, StructCopyTest) {
     char buff[sizeof(TestStruct)];
     TestStruct ts;
 
-    Os::InterruptLock intLock;
     Os::IntervalTimer timer;
 
-    intLock.lock();
     timer.start();
 
     I32 iterations = 1000000;
@@ -690,7 +692,6 @@ TEST(PerformanceTest, StructCopyTest) {
     }
 
     timer.stop();
-    intLock.unLock();
 
     printf("%d iterations took %d us (%f each).\n", iterations, timer.getDiffUsec(),
            static_cast<F32>(timer.getDiffUsec()) / static_cast<F32>(iterations));
@@ -700,10 +701,8 @@ TEST(PerformanceTest, ClassCopyTest) {
     char buff[sizeof(MySerializable)];
     MySerializable ms;
 
-    Os::InterruptLock intLock;
     Os::IntervalTimer timer;
 
-    intLock.lock();
     timer.start();
 
     I32 iterations = 1000000;
@@ -713,7 +712,6 @@ TEST(PerformanceTest, ClassCopyTest) {
     }
 
     timer.stop();
-    intLock.unLock();
 
     printf("%d iterations took %d us (%f each).\n", iterations, timer.getDiffUsec(),
            static_cast<F32>(timer.getDiffUsec()) / static_cast<F32>(iterations));
@@ -1240,8 +1238,8 @@ TEST(Nominal, string_copy) {
     char buffer_out_test[10];
     char buffer_out_truth[10];
 
-    char* out_truth = ::strncpy(buffer_out_truth, copy_string, sizeof(buffer_out_truth));
-    char* out_test = Fw::StringUtils::string_copy(buffer_out_test, copy_string, sizeof(buffer_out_test));
+    char* out_truth = ::strncpy(buffer_out_truth, copy_string, static_cast<FwSizeType>(sizeof(buffer_out_truth)));
+    char* out_test = Fw::StringUtils::string_copy(buffer_out_test, copy_string, static_cast<FwSizeType>(sizeof(buffer_out_test)));
 
     ASSERT_EQ(sizeof(buffer_out_truth), sizeof(buffer_out_test)) << "Buffer size mismatch";
 
@@ -1266,8 +1264,8 @@ TEST(OffNominal, string_copy) {
     char buffer_out_test[sizeof(copy_string) - 1];
     char buffer_out_truth[sizeof(copy_string) - 1];
 
-    char* out_truth = ::strncpy(buffer_out_truth, copy_string, sizeof(buffer_out_truth));
-    char* out_test = Fw::StringUtils::string_copy(buffer_out_test, copy_string, sizeof(buffer_out_test));
+    char* out_truth = ::strncpy(buffer_out_truth, copy_string, static_cast<FwSizeType>(sizeof(buffer_out_truth)));
+    char* out_test = Fw::StringUtils::string_copy(buffer_out_test, copy_string, static_cast<FwSizeType>(sizeof(buffer_out_test)));
 
     ASSERT_EQ(sizeof(buffer_out_truth), sizeof(buffer_out_test)) << "Buffer size mismatch";
 
@@ -1287,13 +1285,13 @@ TEST(OffNominal, string_copy) {
 
 TEST(Nominal, string_len) {
     const char* test_string = "abc123";
-    ASSERT_EQ(Fw::StringUtils::string_length(test_string, 50), 6);
-    ASSERT_EQ(Fw::StringUtils::string_length(test_string, 3), 3);
+    ASSERT_EQ(Fw::StringUtils::string_length(test_string, static_cast<FwSizeType>(50)), 6);
+    ASSERT_EQ(Fw::StringUtils::string_length(test_string, static_cast<FwSizeType>(3)), 3);
 }
 
 TEST(OffNominal, string_len_zero) {
     const char* test_string = "abc123";
-    ASSERT_EQ(Fw::StringUtils::string_length(test_string, 0), 0);
+    ASSERT_EQ(Fw::StringUtils::string_length(test_string, static_cast<FwSizeType>(0)), 0);
 }
 
 TEST(OffNominal, sub_string_no_match) {

@@ -5,6 +5,7 @@
 // ======================================================================
 
 #include "Fw/Com/ComPacket.hpp"
+#include "Fw/Types/FileNameString.hpp"
 #include "Fw/Types/Serializable.hpp"
 #include "Os/File.hpp"
 #include "Svc/DpWriter/DpWriter.hpp"
@@ -30,7 +31,7 @@ void DpWriter::configure(const Fw::StringBase& dpFileNamePrefix) {
 // Handler implementations for user-defined typed input ports
 // ----------------------------------------------------------------------
 
-void DpWriter::bufferSendIn_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& buffer) {
+void DpWriter::bufferSendIn_handler(const FwIndexType portNum, Fw::Buffer& buffer) {
     Fw::Success::T status = Fw::Success::SUCCESS;
     // portNum is unused
     (void)portNum;
@@ -111,7 +112,7 @@ void DpWriter::bufferSendIn_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& b
     }
 }
 
-void DpWriter::schedIn_handler(const NATIVE_INT_TYPE portNum, U32 context) {
+void DpWriter::schedIn_handler(const FwIndexType portNum, U32 context) {
     // portNum and context are not used
     (void)portNum;
     (void)context;
@@ -224,11 +225,9 @@ void DpWriter::sendNotification(const Fw::DpContainer& container,
                                 const Fw::FileNameString& fileName,
                                 FwSizeType fileSize) {
     if (isConnected_dpWrittenOut_OutputPort(0)) {
-        // Construct the file name
-        fileNameString portFileName(fileName.toChar());
         // Get the priority
         const FwDpPriorityType priority = container.getPriority();
-        this->dpWrittenOut_out(0, portFileName, priority, fileSize);
+        this->dpWrittenOut_out(0, fileName, priority, fileSize);
     }
 }
 

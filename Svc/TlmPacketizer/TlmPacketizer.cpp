@@ -47,10 +47,6 @@ TlmPacketizer ::TlmPacketizer(const char* const compName)
     }
 }
 
-void TlmPacketizer ::init(const NATIVE_INT_TYPE queueDepth, const NATIVE_INT_TYPE instance) {
-    TlmPacketizerComponentBase::init(queueDepth, instance);
-}
-
 TlmPacketizer ::~TlmPacketizer() {}
 
 void TlmPacketizer::setPacketList(const TlmPacketizerPacketList& packetList,
@@ -184,7 +180,7 @@ TlmPacketizer::TlmEntry* TlmPacketizer::findBucket(FwChanIdType id) {
 // Handler implementations for user-defined typed input ports
 // ----------------------------------------------------------------------
 
-void TlmPacketizer ::TlmRecv_handler(const NATIVE_INT_TYPE portNum,
+void TlmPacketizer ::TlmRecv_handler(const FwIndexType portNum,
                                      FwChanIdType id,
                                      Fw::Time& timeTag,
                                      Fw::TlmBuffer& val) {
@@ -225,7 +221,6 @@ void TlmPacketizer ::TlmRecv_handler(const NATIVE_INT_TYPE portNum,
         // check if current packet has this channel
         if (entryToUse->packetOffset[pkt] != -1) {
             // get destination address
-            // printf("PK %d CH: %d\n",this->m_fillBuffers[pkt].id,id);
             this->m_lock.lock();
             this->m_fillBuffers[pkt].updated = true;
             this->m_fillBuffers[pkt].latestTime = timeTag;
@@ -236,7 +231,7 @@ void TlmPacketizer ::TlmRecv_handler(const NATIVE_INT_TYPE portNum,
     }
 }
 
-void TlmPacketizer ::Run_handler(const NATIVE_INT_TYPE portNum, U32 context) {
+void TlmPacketizer ::Run_handler(const FwIndexType portNum, U32 context) {
     FW_ASSERT(this->m_configured);
 
     // Only write packets if connected
@@ -283,7 +278,7 @@ void TlmPacketizer ::Run_handler(const NATIVE_INT_TYPE portNum, U32 context) {
     }
 }
 
-void TlmPacketizer ::pingIn_handler(const NATIVE_INT_TYPE portNum, U32 key) {
+void TlmPacketizer ::pingIn_handler(const FwIndexType portNum, U32 key) {
     // return key
     this->pingOut_out(0, key);
 }

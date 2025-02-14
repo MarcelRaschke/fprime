@@ -334,8 +334,8 @@ namespace Svc {
     FileBuffer fileBufferOut(data, sizeof(data));
     fileBufferOut.write(sourceFileName);
 
-    sourceFileNameString srcFileArg(sourceFileName);
-    destFileNameString  destFileArg(destFileName);
+    Fw::String srcFileArg(sourceFileName);
+    Fw::String destFileArg(destFileName);
     Svc::SendFileResponse resp = this->invoke_to_SendFile(0, srcFileArg, destFileArg, 0, 0);
 
     ASSERT_EQ(resp.getstatus(), SendFileStatus::STATUS_OK);
@@ -395,7 +395,7 @@ namespace Svc {
 
    void FileDownlinkTester ::
     from_bufferSendOut_handler(
-        const NATIVE_INT_TYPE portNum,
+        const FwIndexType portNum,
         Fw::Buffer& buffer
     )
   {
@@ -413,7 +413,7 @@ namespace Svc {
 
    void FileDownlinkTester ::
      from_pingOut_handler(
-         const NATIVE_INT_TYPE portNum,
+         const FwIndexType portNum,
          U32 key
     )
     {
@@ -422,7 +422,7 @@ namespace Svc {
 
     void FileDownlinkTester ::
       from_FileComplete_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const FwIndexType portNum, /*!< The port number*/
           const Svc::SendFileResponse& response
       )
     {

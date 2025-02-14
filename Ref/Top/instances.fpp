@@ -77,10 +77,10 @@ module Ref {
     stack size Default.STACK_SIZE \
     priority 97
 
-  #instance tlmSend: Svc.TlmPacketizer base id 0x0C00 \
-  #    queue size Default.QUEUE_SIZE \
-  #    stack size Default.STACK_SIZE \
-  #    priority 97
+#   instance tlmSend: Svc.TlmPacketizer base id 0x0C00 \
+#       queue size Default.QUEUE_SIZE \
+#       stack size Default.STACK_SIZE \
+#       priority 97
 
   instance prmDb: Svc.PrmDb base id 0x0D00 \
     queue size Default.QUEUE_SIZE \
@@ -129,6 +129,8 @@ module Ref {
 
   instance sendBuffComp: Ref.SendBuff base id 0x2600 \
     queue size Default.QUEUE_SIZE
+  
+
 
   # ----------------------------------------------------------------------
   # Passive component instances
@@ -161,5 +163,7 @@ module Ref {
   instance systemResources: Svc.SystemResources base id 0x4B00
 
   instance dpBufferManager: Svc.BufferManager base id 0x4C00
+  
+  instance version: Svc.Version base id 0x4D00 
 
 }

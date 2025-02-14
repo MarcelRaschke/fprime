@@ -55,8 +55,8 @@ namespace Svc {
       //! Handler for from_CycleOut
       //!
       void from_CycleOut_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Svc::TimerVal &cycleStart /*!< Cycle start timer value*/
+          const FwIndexType portNum, /*!< The port number*/
+          Os::RawTime &cycleStart /*!< Cycle start timer value*/
       );
 
     private:

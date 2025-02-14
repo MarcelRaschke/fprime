@@ -34,13 +34,6 @@ namespace Svc {
           const char *const compName //!< The component name
       );
 
-      //! Initialize object FileManager
-      //!
-      void init(
-          const NATIVE_INT_TYPE queueDepth, //!< The queue depth
-          const NATIVE_INT_TYPE instance //!< The instance number
-      );
-
       //! Destroy object FileManager
       //!
       ~FileManager();
@@ -114,7 +107,7 @@ namespace Svc {
       //! Handler implementation for pingIn
       //!
       void pingIn_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const FwIndexType portNum, /*!< The port number*/
           U32 key /*!< Value to return to pinger*/
       );
 

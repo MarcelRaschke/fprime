@@ -37,7 +37,7 @@ namespace Svc {
                 ~ArrayFIFOBuffer();
 
                 void init(Fw::Buffer* const elements,  //!< The array elements
-                        NATIVE_UINT_TYPE capacity    //!< The capacity
+                          NATIVE_UINT_TYPE capacity    //!< The capacity
                         );
 
                 //! Enqueue an index.
@@ -92,12 +92,6 @@ namespace Svc {
                 const char* const compName /*!< The component name*/
                 );
 
-        //! Initialize BufferAccumulator instance
-        //!
-        void init(const NATIVE_INT_TYPE queueDepth,   //!< The queue depth
-                const NATIVE_INT_TYPE instance = 0  //!< The instance number
-                );
-
         //! Destroy BufferAccumulator instance
         //!
         ~BufferAccumulator();
@@ -126,18 +120,18 @@ namespace Svc {
         //!
         void
             bufferSendInFill_handler(
-                    const NATIVE_INT_TYPE portNum,  //!< The port number
+                    const FwIndexType portNum,  //!< The port number
                     Fw::Buffer& buffer);
 
         //! Handler implementation for bufferSendInReturn
         //!
         void bufferSendInReturn_handler(
-                const NATIVE_INT_TYPE portNum,  //!< The port number
+                const FwIndexType portNum,  //!< The port number
                 Fw::Buffer& buffer);
 
         //! Handler implementation for pingIn
         //!
-        void pingIn_handler(const NATIVE_INT_TYPE portNum,  //!< The port number
+        void pingIn_handler(const FwIndexType portNum,  //!< The port number
                             U32 key  //!< Value to return to pinger
                             );
 

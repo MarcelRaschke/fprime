@@ -9,12 +9,12 @@
 // acknowledged.
 // ======================================================================
 // Provides access to autocoded functions
-#include <Ref/Top/RefTopologyAc.hpp>
 #include <Ref/Top/RefPacketsAc.hpp>
+#include <Ref/Top/RefTopologyAc.hpp>
 
 // Necessary project-specified types
 #include <Fw/Types/MallocAllocator.hpp>
-#include <Os/Log.hpp>
+#include <Os/Console.hpp>
 #include <Svc/FramingProtocol/FprimeProtocol.hpp>
 
 // Used for 1Hz synthetic cycling
@@ -23,8 +23,8 @@
 // Allows easy reference to objects in FPP/autocoder required namespaces
 using namespace Ref;
 
-// Instantiate a system logger that will handle Fw::Logger::logMsg calls
-Os::Log logger;
+// Instantiate a system logger that will handle Fw::Logger::log calls
+Os::Console logger;
 
 // The reference topology uses a malloc-based allocator for components that need to allocate memory during the
 // initialization phase.
@@ -62,24 +62,6 @@ enum TopologyConstants {
     DP_BUFFER_MANAGER_ID = 300
 };
 
-// Ping entries are autocoded, however; this code is not properly exported. Thus, it is copied here.
-Svc::Health::PingEntry pingEntries[] = {
-    {PingEntries::blockDrv::WARN, PingEntries::blockDrv::FATAL, "blockDrv"},
-    {PingEntries::tlmSend::WARN, PingEntries::tlmSend::FATAL, "chanTlm"},
-    {PingEntries::cmdDisp::WARN, PingEntries::cmdDisp::FATAL, "cmdDisp"},
-    {PingEntries::cmdSeq::WARN, PingEntries::cmdSeq::FATAL, "cmdSeq"},
-    {PingEntries::eventLogger::WARN, PingEntries::eventLogger::FATAL, "eventLogger"},
-    {PingEntries::fileDownlink::WARN, PingEntries::fileDownlink::FATAL, "fileDownlink"},
-    {PingEntries::fileManager::WARN, PingEntries::fileManager::FATAL, "fileManager"},
-    {PingEntries::fileUplink::WARN, PingEntries::fileUplink::FATAL, "fileUplink"},
-    {PingEntries::pingRcvr::WARN, PingEntries::pingRcvr::FATAL, "pingRcvr"},
-    {PingEntries::prmDb::WARN, PingEntries::prmDb::FATAL, "prmDb"},
-    {PingEntries::rateGroup1Comp::WARN, PingEntries::rateGroup1Comp::FATAL, "rateGroup1Comp"},
-    {PingEntries::rateGroup2Comp::WARN, PingEntries::rateGroup2Comp::FATAL, "rateGroup2Comp"},
-    {PingEntries::rateGroup3Comp::WARN, PingEntries::rateGroup3Comp::FATAL, "rateGroup3Comp"},
-    {PingEntries::dpCat::WARN, PingEntries::dpCat::FATAL, "rateGroup3Comp"},
-};
-
 /**
  * \brief configure/setup components in project-specific way
  *
@@ -108,7 +90,8 @@ void configureTopology() {
     prmDb.readParamFile();
 
     // Health is supplied a set of ping entires.
-    health.setPingEntries(pingEntries, FW_NUM_ARRAY_ELEMENTS(pingEntries), HEALTH_WATCHDOG_CODE);
+    health.setPingEntries(ConfigObjects::Ref_health::pingEntries,
+                          FW_NUM_ARRAY_ELEMENTS(ConfigObjects::Ref_health::pingEntries), HEALTH_WATCHDOG_CODE);
 
     // Buffer managers need a configured set of buckets and an allocator used to allocate memory for those buckets.
     Svc::BufferManager::BufferBins upBuffMgrBins;
@@ -128,15 +111,16 @@ void configureTopology() {
     uplink.setup(deframing);
 
     Fw::FileNameString dpDir("./DpCat");
+    Fw::FileNameString dpState("./DpCat/DpState.dat");
 
     // create the DP directory if it doesn't exist
     Os::FileSystem::createDirectory(dpDir.toChar());
 
-    dpCat.configure(&dpDir,1,0,mallocator);
+    dpCat.configure(&dpDir,1,dpState,0,mallocator);
     dpWriter.configure(dpDir);
 
     // Note: Uncomment when using Svc:TlmPacketizer
-    //tlmSend.setPacketList(RefPacketsPkts, RefPacketsIgnore, 1);
+    // tlmSend.setPacketList(RefPacketsPkts, RefPacketsIgnore, 1);
 }
 
 // Public functions for use in main program are namespaced with deployment name Ref
@@ -150,18 +134,24 @@ void setupTopology(const TopologyState& state) {
     connectComponents();
     // Autocoded command registration. Function provided by autocoder.
     regCommands();
+    // Autocoded configuration. Function provided by autocoder.
+    configComponents(state);
+    if (state.hostname != nullptr && state.port != 0) {
+        comm.configure(state.hostname, state.port);
+    }
     // Project-specific component configuration. Function provided above. May be inlined, if desired.
     configureTopology();
     // Autocoded parameter loading. Function provided by autocoder.
     loadParameters();
     // Autocoded task kick-off (active components). Function provided by autocoder.
     startTasks(state);
+    // Startup TLM and Config verbosity for Versions
+    version.config(true);
     // Initialize socket client communication if and only if there is a valid specification
     if (state.hostname != nullptr && state.port != 0) {
         Os::TaskString name("ReceiveTask");
         // Uplink is configured for receive so a socket task is started
-        comm.configure(state.hostname, state.port);
-        comm.start(name, true, COMM_PRIORITY, Default::STACK_SIZE);
+        comm.start(name, COMM_PRIORITY, Default::STACK_SIZE);
     }
 }
 
@@ -169,7 +159,7 @@ void setupTopology(const TopologyState& state) {
 Os::Mutex cycleLock;
 volatile bool cycleFlag = true;
 
-void startSimulatedCycle(Fw::Time interval) {
+void startSimulatedCycle(Fw::TimeInterval interval) {
     cycleLock.lock();
     bool cycling = cycleFlag;
     cycleLock.unLock();

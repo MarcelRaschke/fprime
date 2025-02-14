@@ -13,6 +13,7 @@
 #include <Utils/Types/Queue.hpp>
 #include "Fw/Types/MemAllocator.hpp"
 #include "Os/Mutex.hpp"
+#include <limits>
 
 namespace Svc {
 
@@ -28,6 +29,8 @@ class ComQueue : public ComQueueComponentBase {
     //!< Count of Fw::Buffer input ports and thus Fw::Buffer queues
     static const FwIndexType BUFFER_PORT_COUNT = ComQueueComponentBase::NUM_BUFFQUEUEIN_INPUT_PORTS;
 
+    static_assert((COM_PORT_COUNT + BUFFER_PORT_COUNT) <= std::numeric_limits<FwIndexType>::max(),
+                  "FwIndexType not large enough to hold com and buffer ports");
     //!< Total count of input buffer ports and thus total queues
     static const FwIndexType TOTAL_PORT_COUNT = COM_PORT_COUNT + BUFFER_PORT_COUNT;
 
@@ -99,12 +102,6 @@ class ComQueue : public ComQueueComponentBase {
     ComQueue(const char* const compName /*!< The component name */
     );
 
-    //! Initialize object ComQueue
-    //!
-    void init(const NATIVE_INT_TYPE queueDepth,  /*!< The queue depth */
-              const NATIVE_INT_TYPE instance = 0 /*!< The instance number */
-    );
-
     //! Destroy object ComQueue
     //!
     ~ComQueue();
@@ -129,26 +126,36 @@ class ComQueue : public ComQueueComponentBase {
 
     //! Receive and queue a Fw::Buffer
     //!
-    void buffQueueIn_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void buffQueueIn_handler(const FwIndexType portNum, /*!< The port number*/
                              Fw::Buffer& fwBuffer /*!< Buffer containing packet data*/);
 
     //! Receive and queue a Fw::ComBuffer
     //!
-    void comQueueIn_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void comQueueIn_handler(const FwIndexType portNum, /*!< The port number*/
                             Fw::ComBuffer& data,           /*!< Buffer containing packet data*/
                             U32 context                    /*!< Call context value; meaning chosen by user*/
     );
 
     //! Handle the status of the last sent message
     //!
-    void comStatusIn_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void comStatusIn_handler(const FwIndexType portNum, /*!< The port number*/
                              Fw::Success& condition         /*!<Status of communication state*/
     );
 
     //! Schedules the transmission of telemetry
     //!
-    void run_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void run_handler(const FwIndexType portNum, /*!< The port number*/
                      U32 context                    /*!<The call order*/
+    );
+
+    // ----------------------------------------------------------------------
+    // Hook implementations for typed async input ports
+    // ----------------------------------------------------------------------
+
+    //! Queue overflow hook method that deallocates the fwBuffer
+    //!
+    void buffQueueIn_overflowHook(FwIndexType portNum, //!< The port number
+                                  Fw::Buffer& fwBuffer //!< The buffer
     );
 
     // ----------------------------------------------------------------------
@@ -157,7 +164,7 @@ class ComQueue : public ComQueueComponentBase {
 
     //! Enqueues a message on the appropriate queue
     //!
-    void enqueue(const FwIndexType queueNum,  //!< Index of the queue to enqueue the message
+    bool enqueue(const FwIndexType queueNum,  //!< Index of the queue to enqueue the message
                  QueueType queueType,         //!< Type of the queue and message data
                  const U8* data,              //!< Pointer to the message data
                  const FwSizeType size        //!< Size of the message

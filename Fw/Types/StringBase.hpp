@@ -12,14 +12,16 @@
 
 #ifndef FW_STRING_BASE_HPP
 #define FW_STRING_BASE_HPP
-
+#include <Fw/Types/format.hpp>
 #include <FpConfig.hpp>
 #include <Fw/Types/Serializable.hpp>
+#include <cstdarg>
 #ifdef BUILD_UT
 #include <iostream>
 #endif
 
 namespace Fw {
+
 class StringBase : public Serializable {
   public:
     using SizeType = NATIVE_UINT_TYPE;
@@ -27,7 +29,7 @@ class StringBase : public Serializable {
     virtual SizeType getCapacity() const = 0;  //!< return size of buffer
     SizeType length() const;                   //!< Get length of string
 
-    //! Get the maximum length of a string that the buffer can hold
+    //! Get the maximum length of a string that the buffer can hold (which is capacity - 1)
     SizeType maxLength() const;
     //! Get the static serialized size of a string
     //! This is the max length of the string plus the size of the stored size
@@ -61,7 +63,8 @@ class StringBase : public Serializable {
     StringBase& operator=(const CHAR* src);               //!< Assign CHAR*
     StringBase& operator=(const StringBase& src);         //!< Assign another StringBase
 
-    void format(const CHAR* formatString, ...);  //!< write formatted string to buffer
+    FormatStatus format(const CHAR* formatString, ...);  //!< write formatted string to buffer
+    FormatStatus vformat(const CHAR* formatString, va_list args);  //!< write formatted string to buffer using va_list
 
     virtual SerializeStatus serialize(SerializeBufferBase& buffer) const;                   //!< serialization function
     virtual SerializeStatus serialize(SerializeBufferBase& buffer, SizeType maxLen) const;  //!< serialization function

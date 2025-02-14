@@ -66,11 +66,6 @@ namespace Drv {
                     const char * const compName /*!< The component name*/
             );
 
-            //! Initialize object LinuxSpiDriver
-            //!
-            void init(const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-            );
-
             //! Destroy object LinuxSpiDriver
             //!
             ~LinuxSpiDriverComponentImpl();
@@ -89,7 +84,7 @@ namespace Drv {
 
             //! Handler implementation for SpiReadWrite
             //!
-            void SpiReadWrite_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+            void SpiReadWrite_handler(const FwIndexType portNum, /*!< The port number*/
             Fw::Buffer &WriteBuffer, Fw::Buffer &readBuffer);
 
             NATIVE_INT_TYPE m_fd;

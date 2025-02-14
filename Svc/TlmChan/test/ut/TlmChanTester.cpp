@@ -14,6 +14,9 @@
 static const NATIVE_UINT_TYPE TEST_CHAN_SIZE = sizeof(FwChanIdType) + Fw::Time::SERIALIZED_SIZE + sizeof(U32);
 static const NATIVE_UINT_TYPE CHANS_PER_COMBUFFER =
     (FW_COM_BUFFER_MAX_SIZE - sizeof(FwPacketDescriptorType)) / TEST_CHAN_SIZE;
+static constexpr FwSizeType INTEGER_DIVISION_ROUNDED_UP(FwSizeType a, FwSizeType b) {
+  return ((a % b) == 0) ? (a / b) : (a / b) + 1;
+}
 
 namespace Svc {
 
@@ -75,7 +78,7 @@ void TlmChanTester::runMultiChannel() {
     // do a run, and all the packets should be sent
     this->doRun(true);
     ASSERT_TRUE(this->m_bufferRecv);
-    ASSERT_EQ((FW_NUM_ARRAY_ELEMENTS(ID_0) / CHANS_PER_COMBUFFER) + 1, this->m_numBuffs);
+    ASSERT_EQ(INTEGER_DIVISION_ROUNDED_UP(FW_NUM_ARRAY_ELEMENTS(ID_0), CHANS_PER_COMBUFFER), this->m_numBuffs);
     ASSERT_EQ(1, this->component.m_activeBuffer);
 
     // verify packets
@@ -102,7 +105,7 @@ void TlmChanTester::runMultiChannel() {
     // do a run, and all the packets should be sent
     this->doRun(true);
     ASSERT_TRUE(this->m_bufferRecv);
-    ASSERT_EQ((FW_NUM_ARRAY_ELEMENTS(ID_1) / CHANS_PER_COMBUFFER) + 1, this->m_numBuffs);
+    ASSERT_EQ(INTEGER_DIVISION_ROUNDED_UP(FW_NUM_ARRAY_ELEMENTS(ID_1), CHANS_PER_COMBUFFER), this->m_numBuffs);
     ASSERT_EQ(0, this->component.m_activeBuffer);
 
     // verify packets
@@ -133,14 +136,14 @@ void TlmChanTester::runOffNominal() {
 // Handlers for typed from ports
 // ----------------------------------------------------------------------
 
-void TlmChanTester ::from_PktSend_handler(const NATIVE_INT_TYPE portNum, Fw::ComBuffer& data, U32 context) {
+void TlmChanTester ::from_PktSend_handler(const FwIndexType portNum, Fw::ComBuffer& data, U32 context) {
     this->pushFromPortEntry_PktSend(data, context);
     this->m_bufferRecv = true;
     this->m_rcvdBuffer[this->m_numBuffs] = data;
     this->m_numBuffs++;
 }
 
-void TlmChanTester ::from_pingOut_handler(const NATIVE_INT_TYPE portNum, U32 key) {
+void TlmChanTester ::from_pingOut_handler(const FwIndexType portNum, U32 key) {
     this->pushFromPortEntry_pingOut(key);
 }
 

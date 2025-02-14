@@ -36,17 +36,13 @@ DpTest::DpTest(const char* const compName,
     }
 }
 
-void DpTest ::init(const NATIVE_INT_TYPE queueDepth, const NATIVE_INT_TYPE instance) {
-    DpTestComponentBase::init(queueDepth, instance);
-}
-
 DpTest ::~DpTest() {}
 
 // ----------------------------------------------------------------------
 // Handler implementations for user-defined typed input ports
 // ----------------------------------------------------------------------
 
-void DpTest::schedIn_handler(const NATIVE_INT_TYPE portNum, U32 context) {
+void DpTest::schedIn_handler(const FwIndexType portNum, U32 context) {
     // Request a buffer for Container 1
     this->dpRequest_Container1(CONTAINER_1_DATA_SIZE);
     // Request a buffer for Container 2
@@ -106,6 +102,7 @@ void DpTest::schedIn_handler(const NATIVE_INT_TYPE portNum, U32 context) {
 void DpTest ::dpRecv_Container1_handler(DpContainer& container, Fw::Success::T status) {
     // Test container assignment
     this->m_container = container;
+    this->checkContainerEmpty(this->m_container);
     if (status == Fw::Success::SUCCESS) {
         auto serializeStatus = Fw::FW_SERIALIZE_OK;
         for (FwSizeType i = 0; i < CONTAINER_1_DATA_SIZE; ++i) {
@@ -117,12 +114,15 @@ void DpTest ::dpRecv_Container1_handler(DpContainer& container, Fw::Success::T s
         }
         // Use the time stamp from the time get port
         this->dpSend(this->m_container);
+        // Check that buffer is no longer valid
+        FW_ASSERT(!this->m_container.getBuffer().isValid());
     }
 }
 
 void DpTest ::dpRecv_Container2_handler(DpContainer& container, Fw::Success::T status) {
     // Test container assignment
     this->m_container = container;
+    this->checkContainerEmpty(this->m_container);
     if (status == Fw::Success::SUCCESS) {
         const DpTest_Data dataRecord(this->dataRecordData);
         auto serializeStatus = Fw::FW_SERIALIZE_OK;
@@ -135,12 +135,15 @@ void DpTest ::dpRecv_Container2_handler(DpContainer& container, Fw::Success::T s
         }
         // Provide an explicit time stamp
         this->dpSend(this->m_container, this->sendTime);
+        // Check that buffer is no longer valid
+        FW_ASSERT(!this->m_container.getBuffer().isValid());
     }
 }
 
 void DpTest ::dpRecv_Container3_handler(DpContainer& container, Fw::Success::T status) {
     // Test container assignment
     this->m_container = container;
+    this->checkContainerEmpty(this->m_container);
     if (status == Fw::Success::SUCCESS) {
         auto serializeStatus = Fw::FW_SERIALIZE_OK;
         for (FwSizeType i = 0; i < CONTAINER_3_DATA_SIZE; ++i) {
@@ -153,12 +156,15 @@ void DpTest ::dpRecv_Container3_handler(DpContainer& container, Fw::Success::T s
         }
         // Use the time stamp from the time get port
         this->dpSend(this->m_container);
+        // Check that buffer is no longer valid
+        FW_ASSERT(!this->m_container.getBuffer().isValid());
     }
 }
 
 void DpTest ::dpRecv_Container4_handler(DpContainer& container, Fw::Success::T status) {
     // Test container assignment
     this->m_container = container;
+    this->checkContainerEmpty(this->m_container);
     if (status == Fw::Success::SUCCESS) {
         auto serializeStatus = Fw::FW_SERIALIZE_OK;
         for (FwSizeType i = 0; i < CONTAINER_4_DATA_SIZE; ++i) {
@@ -171,12 +177,15 @@ void DpTest ::dpRecv_Container4_handler(DpContainer& container, Fw::Success::T s
         }
         // Use the time stamp from the time get port
         this->dpSend(this->m_container);
+        // Check that buffer is no longer valid
+        FW_ASSERT(!this->m_container.getBuffer().isValid());
     }
 }
 
 void DpTest ::dpRecv_Container5_handler(DpContainer& container, Fw::Success::T status) {
     // Test container assignment
     this->m_container = container;
+    this->checkContainerEmpty(this->m_container);
     if (status == Fw::Success::SUCCESS) {
         auto serializeStatus = Fw::FW_SERIALIZE_OK;
         for (FwSizeType i = 0; i < CONTAINER_5_DATA_SIZE; ++i) {
@@ -189,12 +198,15 @@ void DpTest ::dpRecv_Container5_handler(DpContainer& container, Fw::Success::T s
         }
         // Use the time stamp from the time get port
         this->dpSend(this->m_container);
+        // Check that buffer is no longer valid
+        FW_ASSERT(!this->m_container.getBuffer().isValid());
     }
 }
 
 void DpTest ::dpRecv_Container6_handler(DpContainer& container, Fw::Success::T status) {
     // Test container assignment
     this->m_container = container;
+    this->checkContainerEmpty(this->m_container);
     if (status == Fw::Success::SUCCESS) {
         auto serializeStatus = Fw::FW_SERIALIZE_OK;
         for (FwSizeType i = 0; i < CONTAINER_6_DATA_SIZE; ++i) {
@@ -206,12 +218,15 @@ void DpTest ::dpRecv_Container6_handler(DpContainer& container, Fw::Success::T s
         }
         // Use the time stamp from the time get port
         this->dpSend(this->m_container);
+        // Check that buffer is no longer valid
+        FW_ASSERT(!this->m_container.getBuffer().isValid());
     }
 }
 
 void DpTest ::dpRecv_Container7_handler(DpContainer& container, Fw::Success::T status) {
     // Test container assignment
     this->m_container = container;
+    this->checkContainerEmpty(this->m_container);
     if (status == Fw::Success::SUCCESS) {
         auto serializeStatus = Fw::FW_SERIALIZE_OK;
         for (FwSizeType i = 0; i < CONTAINER_7_DATA_SIZE; ++i) {
@@ -224,6 +239,8 @@ void DpTest ::dpRecv_Container7_handler(DpContainer& container, Fw::Success::T s
         }
         // Use the time stamp from the time get port
         this->dpSend(this->m_container);
+        // Check that buffer is no longer valid
+        FW_ASSERT(!this->m_container.getBuffer().isValid());
     }
 }
 
@@ -231,10 +248,21 @@ void DpTest ::dpRecv_Container7_handler(DpContainer& container, Fw::Success::T s
 // Private helper functions
 // ----------------------------------------------------------------------
 
+void DpTest::checkContainerEmpty(const DpContainer& container) const {
+    const FwSizeType dataSize = container.getDataSize();
+    FW_ASSERT(dataSize == 0, static_cast<FwAssertArgType>(dataSize));
+    const Fw::SerializeBufferBase& buffer = container.m_dataBuffer;
+    const FwSizeType buffLength = buffer.getBuffLength();
+    FW_ASSERT(buffLength == 0, static_cast<FwAssertArgType>(buffLength));
+    const FwSizeType buffLeft = buffer.getBuffLeft();
+    FW_ASSERT(buffLeft == 0, static_cast<FwAssertArgType>(buffLeft));
+}
+
 void DpTest::checkContainer(const DpContainer& container,
                             FwDpIdType localId,
                             FwSizeType size,
                             FwDpPriorityType priority) const {
+    this->checkContainerEmpty(container);
     FW_ASSERT(container.getBaseId() == this->getIdBase(), container.getBaseId(), this->getIdBase());
     FW_ASSERT(container.getId() == container.getBaseId() + localId, container.getId(), container.getBaseId(),
               ContainerId::Container1);

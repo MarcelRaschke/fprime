@@ -14,13 +14,13 @@
 #define TcpClientComponentImpl_HPP
 
 #include <Drv/Ip/IpSocket.hpp>
-#include <Drv/Ip/SocketReadTask.hpp>
+#include <Drv/Ip/SocketComponentHelper.hpp>
 #include <Drv/Ip/TcpClientSocket.hpp>
 #include "Drv/TcpClient/TcpClientComponentAc.hpp"
 
 namespace Drv {
 
-class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadTask {
+class TcpClientComponentImpl : public TcpClientComponentBase, public SocketComponentHelper {
   public:
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
@@ -54,12 +54,14 @@ class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadT
      * \param send_timeout_seconds: send timeout seconds component. Defaults to: SOCKET_TIMEOUT_SECONDS
      * \param send_timeout_microseconds: send timeout microseconds component. Must be less than 1000000. Defaults to:
      * SOCKET_TIMEOUT_MICROSECONDS
+     * \param buffer_size: size of the buffer to be allocated. Defaults to 1024.
      * \return status of the configure
      */
     SocketIpStatus configure(const char* hostname,
                              const U16 port,
                              const U32 send_timeout_seconds = SOCKET_SEND_TIMEOUT_SECONDS,
-                             const U32 send_timeout_microseconds = SOCKET_SEND_TIMEOUT_MICROSECONDS);
+                             const U32 send_timeout_microseconds = SOCKET_SEND_TIMEOUT_MICROSECONDS,
+                             FwSizeType buffer_size = 1024);
 
   PROTECTED:
     // ----------------------------------------------------------------------
@@ -123,9 +125,12 @@ class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadT
      * \param fwBuffer: buffer containing data to be sent
      * \return SEND_OK on success, SEND_RETRY when critical data should be retried and SEND_ERROR upon error
      */
-    Drv::SendStatus send_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& fwBuffer);
+    Drv::SendStatus send_handler(const FwIndexType portNum, Fw::Buffer& fwBuffer);
 
     Drv::TcpClientSocket m_socket; //!< Socket implementation
+
+    // Member variable to store the buffer size
+    FwSizeType m_allocation_size;
 };
 
 }  // end namespace Drv

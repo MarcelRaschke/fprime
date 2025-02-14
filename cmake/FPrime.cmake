@@ -17,6 +17,16 @@ if (IS_DIRECTORY "${FPRIME_PROJECT_ROOT}/cmake")
     list(APPEND CMAKE_MODULE_PATH "${FPRIME_PROJECT_ROOT}/cmake")
 endif()
 
+# for adding libraries from the _fprime_packages directory
+if (IS_DIRECTORY "${FPRIME_PROJECT_ROOT}/_fprime_packages")
+    if (EXISTS "${FPRIME_PROJECT_ROOT}/_fprime_packages/packages.cmake")
+        include("${FPRIME_PROJECT_ROOT}/_fprime_packages/packages.cmake")
+        message(STATUS "[FPRIME] Including libraries from ${FPRIME_PROJECT_ROOT}/_fprime_packages")
+    else()
+        message(WARNING "[FPRIME] ${FPRIME_PROJECT_ROOT}/_fprime_packages/packages.cmake does not exist. Skipping.")
+    endif()
+endif()
+
 # Setup fprime library locations
 list(REMOVE_DUPLICATES FPRIME_LIBRARY_LOCATIONS)
 set(FPRIME_BUILD_LOCATIONS "${FPRIME_FRAMEWORK_PATH}" ${FPRIME_LIBRARY_LOCATIONS} "${FPRIME_PROJECT_ROOT}")
@@ -109,12 +119,13 @@ macro(fprime_setup_standard_targets)
     if (NOT DEFINED FPRIME_SUB_BUILD_TARGETS)
         # FPP locations must come at the front of the list, then build
         register_fprime_target(target/build)
-        register_fprime_build_autocoder(autocoder/fpp)
-        register_fprime_build_autocoder(autocoder/ai_xml)
-        register_fprime_build_autocoder(autocoder/packets)
+        register_fprime_build_autocoder(autocoder/fpp OFF)
+        register_fprime_build_autocoder(autocoder/ai_xml OFF)
+        register_fprime_build_autocoder(autocoder/packets OFF)
         register_fprime_target(target/version)
         register_fprime_target(target/install)
         register_fprime_ut_target(target/ut)
+        register_fprime_target(target/sbom)
 
         if (FPRIME_ENABLE_UTIL_TARGETS)
             register_fprime_target(target/refresh_cache)
@@ -159,6 +170,7 @@ endmacro(fprime_initialize_build_system)
 # registered.
 ####
 function(fprime_setup_included_code)
+    choose_fprime_implementation(Fw_StringFormat snprintf-format FRAMEWORK_DEFAULT) # Default choice is snprintf
     # Must be done before code is registered but after custom target registration
     setup_global_targets()
     # For BUILD_TESTING builds then set up libraries that support testing

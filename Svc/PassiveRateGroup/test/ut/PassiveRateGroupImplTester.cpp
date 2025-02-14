@@ -38,7 +38,7 @@ void PassiveRateGroupTester::clearPortCalls() {
 
 PassiveRateGroupTester::~PassiveRateGroupTester() {}
 
-void PassiveRateGroupTester::from_RateGroupMemberOut_handler(NATIVE_INT_TYPE portNum, U32 context) {
+void PassiveRateGroupTester::from_RateGroupMemberOut_handler(FwIndexType portNum, U32 context) {
     ASSERT_TRUE(portNum < static_cast<NATIVE_INT_TYPE>(FW_NUM_ARRAY_ELEMENTS(m_impl.m_RateGroupMemberOut_OutputPort)));
     this->m_callLog[portNum].portCalled = true;
     this->m_callLog[portNum].contextVal = context;
@@ -55,15 +55,15 @@ void PassiveRateGroupTester::runNominal(NATIVE_INT_TYPE contexts[],
     // clear events
     this->clearTlm();
 
-    Svc::TimerVal timer;
-    timer.take();
+    Os::RawTime timestamp;
+    timestamp.now();
 
     // clear port call log
     this->clearPortCalls();
 
     REQUIREMENT("FPRIME-PRG-001");
-    // call active rate group with timer val
-    this->invoke_to_CycleIn(0, timer);
+    // call active rate group with timestamp val
+    this->invoke_to_CycleIn(0, timestamp);
 
 
     // check calls

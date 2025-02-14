@@ -37,15 +37,6 @@ namespace Svc {
           const char *const compName /*!< The component name*/
       );
 
-      //! Initialize object UdpSender
-      //!
-      void init(
-          const NATIVE_INT_TYPE queueDepth, /*!< The queue depth*/
-          const NATIVE_INT_TYPE msgSize, /*!< The message size*/
-          const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-      );
-
-
       //! Destroy object UdpSender
       //!
       ~UdpSenderComponentImpl();
@@ -66,7 +57,7 @@ namespace Svc {
       //! Handler implementation for Sched
       //!
       void Sched_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const FwIndexType portNum, /*!< The port number*/
           U32 context /*!< The call order*/
       );
 
@@ -79,7 +70,7 @@ namespace Svc {
       //! Handler implementation for PortsIn
       //!
       void PortsIn_handler(
-        NATIVE_INT_TYPE portNum, /*!< The port number*/
+        FwIndexType portNum, /*!< The port number*/
         Fw::SerializeBufferBase &Buffer /*!< The serialization buffer*/
       );
 

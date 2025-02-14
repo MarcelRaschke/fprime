@@ -1,4 +1,3 @@
-\page SvcFramerComponent Svc::Framer Component
 # Svc::Framer (Passive Component)
 
 ## 1. Introduction
@@ -21,9 +20,9 @@ You can use the standard F Prime downlink protocol implementation.
 This implementation works with the F Prime ground data system (GDS).
 
 `Svc::Framer` is designed to act alongside instances of the
-[communication adapter interface](https://nasa.github.io/fprime/Design/communication-adapter-interface.html). In order
+[communication adapter interface](../../../docs/reference/communication-adapter-interface.md). In order
 to work well with communication adapters, `Svc::Framer` implements the framer status
-[protocol](https://nasa.github.io/fprime/Design/communication-adapter-interface.html#framer-status-protocol).
+[protocol](../../../docs/reference/communication-adapter-interface.md#framer-status-protocol).
 
 ## 2. Assumptions
 
@@ -155,7 +154,7 @@ _B_ representing framed data and does the following:
 
 1. Check the return status of the invocation. 
 If the return status is not `Drv::SendStatus::SEND_OK`, then
-use `Fw::Logger::logMsg` to log an error message.
+use `Fw::Logger::log` to log an error message.
 Don't send an event report in this case, because downlink is
 apparently not working.
 
@@ -193,25 +192,19 @@ The diagrams use the following instances:
 
 **Topology 1: Telemetry packets:**
 
-<div>
-<img src="img/top/tlm.png" width=1000/>
-</div>
+![tlm](img/top/tlm.png)
 
 The `chanTlm` instance sends telemetry packets to the `framer` instance.
 
 **Topology 2: Event packets:**
 
-<div>
-<img src="img/top/event.png" width=1000/>
-</div>
+![event](img/top/event.png)
 
 The `eventLogger` instance sends event packets to the `framer` instance.
 
 **Topology 3: File packets:**
 
-<div>
-<img src="img/top/framer-file.png" width=1000/>
-</div>
+![file](img/top/framer-file.png)
 
 The `fileDownlink` instance sends a sequence of file packets,
 representing a complete file, to the `framer` instance.
@@ -232,9 +225,7 @@ can handle the packets.
 
 **Topology 4: Framed data:**
 
-<div>
-<img src="img/top/framed.png" width=1000/>
-</div>
+![framed](img/top/framed.png)
 
 `framer` allocates frame buffers from `buffMgr`.
 It sends buffers containing frames to `comm`.

@@ -34,12 +34,6 @@ namespace Svc {
           const char *const compName /*!< The component name*/
       );
 
-      //! Initialize object LinuxTimer
-      //!
-      void init(
-          const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-      );
-
       //! Destroy object LinuxTimer
       //!
       ~LinuxTimerComponentImpl();
@@ -56,7 +50,7 @@ namespace Svc {
 
       volatile bool m_quit; //!< flag to quit
 
-      Svc::TimerVal m_timer;
+      Os::RawTime m_rawTime; //!< timestamp to pass to CycleOut port calls
 
 
     };

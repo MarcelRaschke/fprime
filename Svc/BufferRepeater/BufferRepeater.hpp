@@ -37,11 +37,6 @@ class BufferRepeater : public BufferRepeaterComponentBase {
     BufferRepeater(const char* const compName /*!< The component name*/
     );
 
-    //! Initialize object BufferRepeater
-    //!
-    void init(const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-    );
-
     //! Destroy object BufferRepeater
     //!
     ~BufferRepeater();
@@ -73,7 +68,7 @@ class BufferRepeater : public BufferRepeaterComponentBase {
 
     //! Handler implementation for portIn
     //!
-    void portIn_handler(NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void portIn_handler(FwIndexType portNum, /*!< The port number*/
                         Fw::Buffer& Buffer       /*!< The serialization buffer*/
     );
 

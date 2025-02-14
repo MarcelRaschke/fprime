@@ -1,9 +1,9 @@
 #include <FpConfig.hpp>
 #include <Fw/Types/Assert.hpp>
+#include <Fw/Types/format.hpp>
+#include <Fw/Types/StringUtils.hpp>
 #include <cassert>
 #include <cstdio>
-
-#define FW_ASSERT_DFL_MSG_LEN 256
 
 #if FW_ASSERT_LEVEL == FW_FILEID_ASSERT
 #define fileIdFs "Assert: 0x%08" PRIx32 ":%" PRI_PlatformUIntType
@@ -14,7 +14,9 @@
 namespace Fw {
 
 void defaultPrintAssert(const CHAR* msg) {
-    (void)fprintf(stderr, "%s\n", msg);
+    // Write to stderr w/o formatting
+    (void) fputs(msg, stderr);
+    (void) fputs("\n", stderr);
 }
 
 void defaultReportAssert(FILE_NAME_ARG file,
@@ -28,46 +30,46 @@ void defaultReportAssert(FILE_NAME_ARG file,
                          FwAssertArgType arg6,
                          CHAR* destBuffer,
                          NATIVE_INT_TYPE buffSize) {
+    static_assert(std::numeric_limits<FwSizeType>::max() >= std::numeric_limits<NATIVE_INT_TYPE>::max(),
+                  "NATIVE_INT_TYPE cannot fit into FwSizeType");
     switch (numArgs) {
         case 0:
-            (void)snprintf(destBuffer, static_cast<size_t>(buffSize), fileIdFs, file, lineNo);
+            (void)stringFormat(destBuffer,  static_cast<FwSizeType>(buffSize), fileIdFs, file, lineNo);
             break;
         case 1:
-            (void)snprintf(destBuffer, static_cast<size_t>(buffSize), fileIdFs " %" PRI_FwAssertArgType, file, lineNo, arg1);
+            (void)stringFormat(destBuffer,  static_cast<FwSizeType>(buffSize),
+                               fileIdFs " %" PRI_FwAssertArgType, file, lineNo, arg1);
             break;
         case 2:
-            (void)snprintf(destBuffer, static_cast<size_t>(buffSize), fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType, file,
-                           lineNo, arg1, arg2);
+            (void)stringFormat(destBuffer,  static_cast<FwSizeType>(buffSize),
+                               fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType, file, lineNo, arg1, arg2);
             break;
         case 3:
-            (void)snprintf(destBuffer, static_cast<size_t>(buffSize),
-                           fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType, file,
-                           lineNo, arg1, arg2, arg3);
+            (void)stringFormat(destBuffer,  static_cast<FwSizeType>(buffSize),
+                               fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType, file,
+                               lineNo, arg1, arg2, arg3);
             break;
         case 4:
-            (void)snprintf(destBuffer, static_cast<size_t>(buffSize),
-                           fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType
-                                    " %" PRI_FwAssertArgType,
+            (void)stringFormat(destBuffer,  static_cast<FwSizeType>(buffSize),
+                               fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType
+                                        " %" PRI_FwAssertArgType,
                            file, lineNo, arg1, arg2, arg3, arg4);
             break;
         case 5:
-            (void)snprintf(destBuffer, static_cast<size_t>(buffSize),
-                           fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType
-                                    " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType,
-                           file, lineNo, arg1, arg2, arg3, arg4, arg5);
+            (void)stringFormat(destBuffer,  static_cast<FwSizeType>(buffSize),
+                               fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType
+                                        " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType,
+                               file, lineNo, arg1, arg2, arg3, arg4, arg5);
             break;
         case 6:
-            (void)snprintf(destBuffer, static_cast<size_t>(buffSize),
-                           fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType
-                                    " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType,
-                           file, lineNo, arg1, arg2, arg3, arg4, arg5, arg6);
+            (void)stringFormat(destBuffer,  static_cast<FwSizeType>(buffSize),
+                               fileIdFs " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType
+                                        " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType " %" PRI_FwAssertArgType,
+                               file, lineNo, arg1, arg2, arg3, arg4, arg5, arg6);
             break;
         default:  // in an assert already, what can we do?
             break;
     }
-
-    // null terminate
-    destBuffer[buffSize - 1] = 0;
 }
 
 void AssertHook::printAssert(const CHAR* msg) {
@@ -83,7 +85,7 @@ void AssertHook::reportAssert(FILE_NAME_ARG file,
                               FwAssertArgType arg4,
                               FwAssertArgType arg5,
                               FwAssertArgType arg6) {
-    CHAR destBuffer[FW_ASSERT_DFL_MSG_LEN];
+    CHAR destBuffer[FW_ASSERT_TEXT_SIZE];
     defaultReportAssert(file, lineNo, numArgs, arg1, arg2, arg3, arg4, arg5, arg6, destBuffer, sizeof(destBuffer));
     // print message
     this->printAssert(destBuffer);
@@ -115,7 +117,7 @@ NATIVE_INT_TYPE defaultSwAssert(FILE_NAME_ARG file,
                                 FwAssertArgType arg5,
                                 FwAssertArgType arg6) {
     if (nullptr == s_assertHook) {
-        CHAR assertMsg[FW_ASSERT_DFL_MSG_LEN];
+        CHAR assertMsg[FW_ASSERT_TEXT_SIZE];
         defaultReportAssert(file, lineNo, numArgs, arg1, arg2, arg3, arg4, arg5, arg6, assertMsg, sizeof(assertMsg));
         defaultPrintAssert(assertMsg);
         assert(0);
@@ -184,7 +186,7 @@ NATIVE_INT_TYPE CAssert0(FILE_NAME_ARG file, NATIVE_UINT_TYPE lineNo);
 
 NATIVE_INT_TYPE CAssert0(FILE_NAME_ARG file, NATIVE_UINT_TYPE lineNo) {
     if (nullptr == Fw::s_assertHook) {
-        CHAR assertMsg[FW_ASSERT_DFL_MSG_LEN];
+        CHAR assertMsg[FW_ASSERT_TEXT_SIZE];
         Fw::defaultReportAssert(file, lineNo, 0, 0, 0, 0, 0, 0, 0, assertMsg, sizeof(assertMsg));
     } else {
         Fw::s_assertHook->reportAssert(file, lineNo, 0, 0, 0, 0, 0, 0, 0);

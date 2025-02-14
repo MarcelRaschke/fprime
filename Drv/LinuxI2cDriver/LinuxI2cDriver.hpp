@@ -31,12 +31,6 @@ namespace Drv {
       //!
       LinuxI2cDriver(const char *const compName);
 
-      //! Initialize object LinuxI2cDriver
-      //!
-      void init(
-          const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-      );
-
       bool open(const char* device);
       //! Destroy object LinuxI2cDriver
       //!
@@ -51,7 +45,7 @@ namespace Drv {
       //! Handler implementation for write
       //!
       I2cStatus write_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const FwIndexType portNum, /*!< The port number*/
           U32 addr,
           Fw::Buffer &serBuffer
       );
@@ -59,7 +53,7 @@ namespace Drv {
       //! Handler implementation for read
       //!
       I2cStatus read_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const FwIndexType portNum, /*!< The port number*/
           U32 addr,
           Fw::Buffer &serBuffer
       );
@@ -67,7 +61,7 @@ namespace Drv {
       //! Handler implementation for writeRead
       //!
       I2cStatus  writeRead_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          const FwIndexType portNum, /*!< The port number*/
           U32 addr,
           Fw::Buffer &writeBuffer,
           Fw::Buffer &readBuffer

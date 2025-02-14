@@ -16,6 +16,9 @@
 #include <getopt.h>
 // Used for printf functions
 #include <cstdlib>
+// Used to get the Os::Console
+#include <Os/Os.hpp>
+
 
 /**
  * \brief print commandline help message
@@ -51,6 +54,7 @@ static void signalHandler(int signum) {
  * @return: 0 on success, something else on failure
  */
 int main(int argc, char* argv[]) {
+    Os::init();
     U32 port_number = 0;
     I32 option = 0;
     char* hostname = nullptr;
@@ -88,7 +92,7 @@ int main(int argc, char* argv[]) {
 
     // Setup, cycle, and teardown topology
     Ref::setupTopology(inputs);
-    Ref::startSimulatedCycle(Fw::Time(1, 0));  // Program loop cycling rate groups at 1Hz
+    Ref::startSimulatedCycle(Fw::TimeInterval(1, 0));  // Program loop cycling rate groups at 1Hz
     Ref::teardownTopology(inputs);
     (void)printf("Exiting...\n");
     return 0;

@@ -78,7 +78,7 @@ namespace Svc {
 
   void BufferLoggerTester ::
     from_bufferSendOut_handler(
-        const NATIVE_INT_TYPE portNum,
+        const FwIndexType portNum,
         Fw::Buffer& fwBuffer
     )
   {
@@ -87,7 +87,7 @@ namespace Svc {
 
   void BufferLoggerTester ::
     from_pingOut_handler(
-        const NATIVE_INT_TYPE portNum,
+        const FwIndexType portNum,
         U32 key
     )
   {
@@ -200,7 +200,7 @@ namespace Svc {
   void BufferLoggerTester ::
     dispatchAll()
   {
-    while(this->component.m_queue.getNumMsgs() > 0)
+    while(this->component.m_queue.getMessagesAvailable() > 0)
       this->dispatchOne();
   }
 

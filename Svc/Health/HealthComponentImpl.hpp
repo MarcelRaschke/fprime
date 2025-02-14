@@ -61,7 +61,7 @@ namespace Svc {
             //!
             //!  \param queueDepth Depth of queue
             //!  \param instance The instance number
-            void init(const NATIVE_INT_TYPE queueDepth, const NATIVE_INT_TYPE instance);
+            void init(const FwSizeType queueDepth, const NATIVE_INT_TYPE instance);
 
             //! \brief Set ping entry tables
             //!
@@ -92,7 +92,7 @@ namespace Svc {
             //!
             //!  \param portNum Port number
             //!  \param key Key value
-            void PingReturn_handler(const NATIVE_INT_TYPE portNum, U32 key);
+            void PingReturn_handler(const FwIndexType portNum, U32 key);
 
             //!  \brief run handler
             //!
@@ -100,7 +100,7 @@ namespace Svc {
             //!
             //!  \param portNum Port number
             //!  \param context Port Context
-            void Run_handler(const NATIVE_INT_TYPE portNum, U32 context);
+            void Run_handler(const FwIndexType portNum, U32 context);
 
             //!  \brief HLTH_ENABLE handler
             //!
@@ -150,7 +150,7 @@ namespace Svc {
             U32 m_watchDogCode; //!< stores code used for watchdog stroking
             U32 m_warnings; //!< number of slip warnings issued
             Fw::Enabled m_enabled; //!< if the pinger is enabled
-            U32 queue_depth; //!< queue depth passed by user
+            FwSizeType queue_depth; //!< queue depth passed by user
 
     };
 
